@@ -1,4 +1,4 @@
-﻿name: CI/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -20,12 +20,10 @@ jobs:
           node-version: "18"
 
       - name: Instalar dependencias
-        run: npm ci
-        working-directory: ./app
+        run: npm ci --prefix ./app
 
       - name: Ejecutar pruebas
-        run: npm test
-        working-directory: ./app
+        run: npm test --prefix ./app
 
   cd:
     name: CD - Build Docker & Smoke Test
@@ -68,3 +66,4 @@ jobs:
         run: |
           docker rm -f mi-app || true
           docker image rm mi-app-ci-cd:latest || true
+
