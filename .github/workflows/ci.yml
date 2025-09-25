@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+﻿name: CI/CD Pipeline
 
 on:
   push:
@@ -11,13 +11,13 @@ jobs:
     name: CI - Build & Test Node
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout del código
+      - name: Checkout del cÃ³digo
         uses: actions/checkout@v4
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "22"
 
       - name: Instalar dependencias
         run: npm ci --prefix ./app
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: ci
     steps:
-      - name: Checkout del código
+      - name: Checkout del cÃ³digo
         uses: actions/checkout@v4
 
       - name: Construir imagen Docker
@@ -47,9 +47,9 @@ jobs:
             fi
             echo "Esperando app... ($i)"; sleep 2
           done
-          echo "La app no respondió a tiempo"; docker logs mi-app; exit 1
+          echo "La app no respondiÃ³ a tiempo"; docker logs mi-app; exit 1
 
-      - name: Probar endpoint raíz
+      - name: Probar endpoint raÃ­z
         run: curl -fsS http://localhost:3000/
 
       - name: Logs del contenedor
@@ -66,4 +66,5 @@ jobs:
         run: |
           docker rm -f mi-app || true
           docker image rm mi-app-ci-cd:latest || true
+
 
