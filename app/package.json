@@ -1,0 +1,15 @@
+{
+  "name": "aplicacion-practica-ci-cd",
+  "version": "1.0.0",
+  "description": "Demostracion de la aplicación CI/CD",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Sin pruebas aún\" && exit 0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
+

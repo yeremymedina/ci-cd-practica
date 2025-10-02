@@ -1,0 +1,70 @@
+﻿name: CI/CD Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  ci:
+    name: CI - Build & Test Node
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del cÃ³digo
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar dependencias
+        run: npm ci --prefix ./app
+
+      - name: Ejecutar pruebas
+        run: npm test --prefix ./app
+
+  cd:
+    name: CD - Build Docker & Smoke Test
+    runs-on: ubuntu-latest
+    needs: ci
+    steps:
+      - name: Checkout del cÃ³digo
+        uses: actions/checkout@v4
+
+      - name: Construir imagen Docker
+        run: docker build -t mi-app-ci-cd:latest ./app
+
+      - name: Ejecutar contenedor (background)
+        run: docker run -d --name mi-app -p 3000:3000 mi-app-ci-cd:latest
+
+      - name: Esperar a que levante
+        run: |
+          for i in {1..20}; do
+            if curl -fsS http://localhost:3000/ > /dev/null; then
+              echo "App OK"; exit 0
+            fi
+            echo "Esperando app... ($i)"; sleep 2
+          done
+          echo "La app no respondiÃ³ a tiempo"; docker logs mi-app; exit 1
+
+      - name: Probar endpoint raÃ­z
+        run: curl -fsS http://localhost:3000/
+
+      - name: Logs del contenedor
+        run: docker logs mi-app | tee app_logs.txt
+
+      - name: Publicar logs como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-logs
+          path: app_logs.txt
+
+      - name: Detener y limpiar
+        if: always()
+        run: |
+          docker rm -f mi-app || true
+          docker image rm mi-app-ci-cd:latest || true
+
+
